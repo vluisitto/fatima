@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Para Ella</title>
+    <!-- Librería de Confeti añadida -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* Estética Minimalista - Black & Space Theme */
         * {
             margin: 0;
             padding: 0;
@@ -14,7 +15,6 @@
         }
 
         body {
-            /* Gradiente muy sutil de azul oscuro espacial a negro */
             background: radial-gradient(ellipse at bottom, #0a1128 0%, #000000 100%);
             color: #f1f5f9;
             display: flex;
@@ -25,7 +25,6 @@
             padding: 20px;
         }
 
-        /* Canvas para las estrellas de fondo */
         #stars-canvas {
             position: fixed;
             top: 0;
@@ -105,16 +104,17 @@
             border-radius: 8px;
             cursor: pointer;
             letter-spacing: 0.05em;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             width: 100%;
         }
 
+        /* IDEA 2: Micro-interacciones (botón principal) */
         button:hover {
             background: #e2e8f0;
-            transform: translateY(-1px);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
         }
 
-        /* Trivia styling */
         .trivia-options {
             display: flex;
             flex-direction: column;
@@ -123,6 +123,7 @@
         }
 
         .option-btn {
+            transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.03);
             color: #cbd5e1;
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -133,10 +134,12 @@
             border-radius: 8px;
         }
 
+        /* IDEA 2: Micro-interacciones (botones de trivia) */
         .option-btn:hover {
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
             border-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(8px) scale(1.01);
         }
 
         #feedback1, #feedback2 {
@@ -146,7 +149,6 @@
             min-height: 20px;
         }
 
-        /* Final Screen Layout */
         .final-layout {
             max-width: 650px;
             text-align: left;
@@ -172,7 +174,6 @@
             letter-spacing: 0.05em;
         }
 
-        /* Rincón Interactivo Tabs/Grid */
         .tabs-nav {
             display: table;
             width: 100%;
@@ -200,20 +201,45 @@
         .tab-content {
             display: none;
             padding-top: 15px;
-            animation: fadeIn 0.5s ease;
         }
 
+        /* IDEA 4: Transiciones de Slide para pestañas */
         .tab-content.active {
             display: block;
+            animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
-        /* Album Items Placement */
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* IDEA 1: Animación FadeInUp y efecto Reveal */
         .archive-item {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 15px;
+            opacity: 0;
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        .archive-item:nth-child(1) { animation-delay: 0.1s; }
+        .archive-item:nth-child(2) { animation-delay: 0.2s; }
+        .archive-item:nth-child(3) { animation-delay: 0.3s; }
+        
+        /* IDEA 6: Estilos para el parallax de imágenes */
+        .parallax-img {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: transform 0.15s ease-out;
+            will-change: transform;
         }
 
         .archive-title {
@@ -233,35 +259,6 @@
             padding-left: 15px;
         }
 
-        .image-placeholder {
-            width: 100%;
-            height: 220px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 2px dashed rgba(255,255,255,0.1);
-            border-radius: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            color: #475569;
-            font-size: 0.85rem;
-            text-align: center;
-            padding: 20px;
-            margin-bottom: 10px;
-        }
-
-        .image-placeholder span {
-            color: #94a3b8;
-            margin-top: 5px;
-            font-size: 0.9rem;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Easter Egg animation */
         .secret-msg {
             position: fixed;
             color: #93c5fd;
@@ -283,10 +280,9 @@
 </head>
 <body>
     
-    <!-- CANVAS PARA EL EFECTO DE ESTRELLAS -->
     <canvas id="stars-canvas"></canvas>
 
-    <!-- PANTALLA 1: FILTRO DE ESTATURA -->
+    <!-- PANTALLA 1 -->
     <div id="screen1" class="card">
         <h1>HOLA FATIMA JAPI CUMPLE</h1>
         <p>para q puedas entrar a la página tienes q responder unas preguntitas jeje, PRIMERO ¿Cuantos centímetros tenemos de diferencia?</p>
@@ -296,7 +292,7 @@
         <div id="feedback1"></div>
     </div>
 
-    <!-- PANTALLA 2: TRIVIA INTERACTIVA -->
+    <!-- PANTALLA 2 -->
     <div id="screen2" class="card hidden">
         <h1 id="triviaTitle">Pregunta 1 de 3</h1>
         <p id="triviaQuestion">Cargando pregunta...</p>
@@ -304,19 +300,17 @@
         <div id="feedback2"></div>
     </div>
 
-    <!-- PANTALLA 3: EL RINCÓN DE NOSOTROS (PORTAL PRINCIPAL) -->
+    <!-- PANTALLA 3 -->
     <div id="screen3" class="card final-layout hidden">
         <div class="section-badge">Fatima y Luisito archive<3</div>
         <h2>Feliz Cumpleaños</h2>
         
-        <!-- Pestañas del Rincón -->
         <div class="tabs-nav">
             <div class="tab-link active" onclick="switchTab(event, 'carta-tab')">Tu Carta</div>
             <div class="tab-link" onclick="switchTab(event, 'cartas-ella-tab')">Tus Textos</div>
             <div class="tab-link" onclick="switchTab(event, 'galeria-tab')">Dibujitos</div>
         </div>
 
-        <!-- PESTAÑA 1: TU CARTA -->
         <div id="carta-tab" class="tab-content active">
             <p>Querida Fatima,<br>
             Quiero aprovechar este momento para agradecerte por la amistad que hemos construido, aunque sea a la distancia. Es increíble cómo alguien puede volverse tan especial sin necesidad de compartir el mismo espacio físico, y tú lo has logrado con tu forma de ser tan auténtica y cercana.</p>
@@ -326,7 +320,6 @@
             Luisito</p>
         </div>
 
-        <!-- PESTAÑA 2: SUS CARTAS (GUARDADAS COMO TESOROS) -->
         <div id="cartas-ella-tab" class="tab-content">
             <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 15px;">Colección de los textos poéticos que has dejado guardados en mi memoria:</p>
             
@@ -345,24 +338,23 @@
             </div>
         </div>
 
-        <!-- PESTAÑA 3: GALERÍA DE FOTOS DEL ESPACIO Y DIBUJOS -->
         <div id="galeria-tab" class="tab-content">
-            <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 15px;">Espacio reservado para las fotos cósmicas y los dibujos que representan lo nuestro:</p>
+            <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 15px;">olafatima eresmuyespecial parawis:</p>
             
+            <!-- IDEA 6: Aplicamos la clase parallax-img a las fotos -->
             <div class="archive-item">
-                <img src="pag.jpg" style="width: 100%; border-radius: 8px; margin-bottom: 10px;" alt="Dibujo 1">
+                <img src="pag.jpg" class="parallax-img" alt="Dibujo 1">
             </div>
 
             <div class="archive-item">
-                <img src="pag2.jpg" style="width: 100%; border-radius: 8px; margin-bottom: 10px;" alt="Dibujo 2">
-                <div class="archive-title" style="text-align: center; margin: 0;">olatequiero</div>
+                <img src="pag2.jpg" class="parallax-img" alt="Dibujo 2">
+                <div class="archive-title" style="text-align: center; margin: 0;">Tus obras de arte y pequeños detalles</div>
             </div>
         </div>
 
     </div>
 
     <script>
-        // 1. Efecto de Estrellas de Fondo (Canvas) Interactivo y Parallax
         const canvas = document.getElementById('stars-canvas');
         const ctx = canvas.getContext('2d');
         let width, height, stars = [];
@@ -371,13 +363,18 @@
         let targetX = mouseX;
         let targetY = mouseY;
 
-        // Seguir el mouse para el efecto parallax
         document.addEventListener('mousemove', (e) => {
             targetX = e.clientX;
             targetY = e.clientY;
+            
+            // IDEA 6: Efecto parallax para imágenes al mover el mouse
+            const imgX = (e.clientX - window.innerWidth / 2) * -0.015;
+            const imgY = (e.clientY - window.innerHeight / 2) * -0.015;
+            document.querySelectorAll('.parallax-img').forEach(img => {
+                img.style.transform = `translate(${imgX}px, ${imgY}px)`;
+            });
         });
         
-        // Soporte para touch en celulares
         document.addEventListener('touchmove', (e) => {
             if(e.touches.length > 0) {
                 targetX = e.touches[0].clientX;
@@ -385,9 +382,7 @@
             }
         });
 
-        // Easter Egg: Mensaje Secreto al hacer clic en el fondo
         document.addEventListener('click', (e) => {
-            // Verifica que el clic sea en el fondo y no dentro de la tarjeta
             if (e.target.id === 'stars-canvas' || e.target.tagName.toLowerCase() === 'body') {
                 const msg = document.createElement('div');
                 msg.className = 'secret-msg';
@@ -395,8 +390,6 @@
                 msg.style.left = e.clientX + 'px';
                 msg.style.top = e.clientY + 'px';
                 document.body.appendChild(msg);
-                
-                // Se elimina despues de la animacion
                 setTimeout(() => msg.remove(), 2000);
             }
         });
@@ -405,38 +398,47 @@
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
             stars = [];
-            // Aumentamos a 200 estrellas para que se vea más tupido
-            for (let i = 0; i < 200; i++) {
+            // IDEA 3: Lista de elementos personalizados (Letras y corazones)
+            const chars = ['❤️', 'F', 'L', '✨'];
+            for (let i = 0; i < 150; i++) {
+                let type = Math.random() > 0.85 ? 'text' : 'star';
+                let char = chars[Math.floor(Math.random() * chars.length)];
                 stars.push({
                     x: Math.random() * width,
                     y: Math.random() * height,
                     r: Math.random() * 1.5,
-                    dy: (Math.random() * 0.3) + 0.1, // velocidad de caída
-                    alpha: Math.random(), // opacidad inicial
-                    dAlpha: (Math.random() * 0.02) - 0.01 // velocidad de parpadeo
+                    dy: (Math.random() * 0.3) + 0.1,
+                    alpha: Math.random(),
+                    dAlpha: (Math.random() * 0.02) - 0.01,
+                    type: type,
+                    char: char,
+                    fontSize: Math.random() * 8 + 8
                 });
             }
         }
 
         function animateStars() {
             ctx.clearRect(0, 0, width, height);
-            
-            // Movimiento suave hacia el mouse (interpolación)
             mouseX += (targetX - mouseX) * 0.05;
             mouseY += (targetY - mouseY) * 0.05;
 
             for (let i = 0; i < stars.length; i++) {
                 let star = stars[i];
-                
-                // Efecto Parallax: las estrellas se mueven sutilmente con el mouse
                 let parallaxX = (mouseX - width / 2) * (star.r * -0.015);
                 let parallaxY = (mouseY - height / 2) * (star.r * -0.015);
 
-                ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
-                ctx.beginPath();
-                ctx.arc(star.x + parallaxX, star.y + parallaxY, star.r, 0, Math.PI * 2, true);
+                // IDEA 3: Dibujar estrellas o textos (Corazones/Iniciales)
+                if (star.type === 'star') {
+                    ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(star.x + parallaxX, star.y + parallaxY, star.r, 0, Math.PI * 2, true);
+                    ctx.fill();
+                } else {
+                    ctx.font = `${star.fontSize}px Arial`;
+                    ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha * 0.7})`; 
+                    ctx.fillText(star.char, star.x + parallaxX, star.y + parallaxY);
+                }
                 
-                // Interacción: si el mouse/dedo pasa muy cerca, las estrellas se alejan tantito
                 let dx = (star.x + parallaxX) - mouseX;
                 let dy = (star.y + parallaxY) - mouseY;
                 let dist = Math.sqrt(dx*dx + dy*dy);
@@ -445,21 +447,17 @@
                     star.y += dy * 0.01;
                 }
 
-                // Efecto Destello (Flicker)
                 star.alpha += star.dAlpha;
                 if (star.alpha <= 0.1 || star.alpha >= 1) {
-                    star.dAlpha = -star.dAlpha; // revierte el cambio
+                    star.dAlpha = -star.dAlpha;
                 }
 
-                // Caída de la estrella
                 star.y += star.dy;
                 
-                // Reiniciar si sale de la pantalla
                 if (star.y > height) {
                     star.y = 0;
                     star.x = Math.random() * width;
                 }
-                ctx.fill();
             }
             requestAnimationFrame(animateStars);
         }
@@ -468,7 +466,6 @@
         initStars();
         animateStars();
 
-        // 2. Lógica del Filtro Inicial (Diferencia de Estatura = 18)
         function checkScreen1() {
             const answer = document.getElementById('passwordInput').value.trim();
             const feedback = document.getElementById('feedback1');
@@ -484,7 +481,6 @@
             }
         }
 
-        // 3. Base de Datos de la Trivia
         const triviaData = [
             {
                 question: "si tuvieras q escoger uno de estos a quien elegirias?",
@@ -533,16 +529,24 @@
             const feedback = document.getElementById('feedback2');
 
             if (currentQuestion.correct === 'any' || selectedIndex === currentQuestion.correct) {
-                failCount = 0; // Reset fail count on success
+                failCount = 0; 
                 currentQuestionIndex++;
                 if (currentQuestionIndex < triviaData.length) {
                     loadQuestion();
                 } else {
                     document.getElementById('screen2').classList.add('hidden');
                     document.getElementById('screen3').classList.remove('hidden');
+                    
+                    // IDEA 5: Disparar confeti al ganar
+                    confetti({
+                        particleCount: 150,
+                        spread: 80,
+                        origin: { y: 0.6 },
+                        colors: ['#ffffff', '#3b82f6', '#93c5fd', '#f1f5f9']
+                    });
                 }
             } else {
-                if (currentQuestionIndex === 0 || currentQuestionIndex === 2) { // Logic for 1st and 3rd question
+                if (currentQuestionIndex === 0 || currentQuestionIndex === 2) { 
                     feedback.innerText = currentQuestion.failMessages[Math.min(failCount, currentQuestion.failMessages.length - 1)];
                     failCount++;
                 } else {
@@ -551,7 +555,6 @@
             }
         }
 
-        // 4. Sistema de Pestañas (Tabs)
         function switchTab(event, tabId) {
             const contents = document.querySelectorAll('.tab-content');
             contents.forEach(content => content.classList.remove('active'));
