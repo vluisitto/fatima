@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Ella</title>
+    <style>
+        /* Estética Minimalista - Black & Space Theme */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            /* Gradiente muy sutil de azul oscuro espacial a negro */
+            background: radial-gradient(ellipse at bottom, #0a1128 0%, #000000 100%);
+            color: #f1f5f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* Canvas para las estrellas de fondo */
+        #stars-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 40px 30px;
+            border-radius: 16px;
+            max-width: 460px;
+            width: 100%;
+            text-align: center;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 0.15em;
+            margin-bottom: 25px;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        p {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .italic-quote {
+            font-style: italic;
+            color: #64748b;
+            margin: 15px 0;
+            font-size: 0.95rem;
+            letter-spacing: 0.02em;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #3b82f6;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        button {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 14px 24px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            letter-spacing: 0.05em;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #e2e8f0;
+            transform: translateY(-1px);
+        }
+
+        /* Trivia styling */
+        .trivia-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.03);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: left;
+            padding: 14px 18px;
+            font-weight: 400;
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        #feedback1, #feedback2 {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: #f87171;
+            min-height: 20px;
+        }
+
+        /* Final Screen Layout */
+        .final-layout {
+            max-width: 650px;
+            text-align: left;
+        }
+
+        .final-layout h2 {
+            font-size: 1.8rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .section-badge {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Rincón Interactivo Tabs/Grid */
+        .tabs-nav {
+            display: table;
+            width: 100%;
+            margin: 25px 0 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tab-link {
+            display: table-cell;
+            text-align: center;
+            padding: 10px;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            transition: color 0.3s;
+        }
+
+        .tab-link.active {
+            color: #fff;
+            font-weight: 500;
+            border-bottom: 2px solid #3b82f6;
+        }
+
+        .tab-content {
+            display: none;
+            padding-top: 15px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Album Items Placement */
+        .archive-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .archive-title {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 10px;
+            letter-spacing: 0.05em;
+        }
+
+        .letter-text {
+            font-family: Georgia, serif;
+            font-style: italic;
+            line-height: 1.7;
+            color: #94a3b8;
+            font-size: 0.95rem;
+            border-left: 2px solid rgba(59, 130, 246, 0.3);
+            padding-left: 15px;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 220px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px dashed rgba(255,255,255,0.1);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: #475569;
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 10px;
+        }
+
+        .image-placeholder span {
+            color: #94a3b8;
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Easter Egg animation */
+        .secret-msg {
+            position: fixed;
+            color: #93c5fd;
+            font-size: 0.95rem;
+            font-style: italic;
+            font-weight: 500;
+            pointer-events: none;
+            animation: floatUp 2s ease-out forwards;
+            z-index: 9999;
+            text-shadow: 0 0 8px rgba(147, 197, 253, 0.6);
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.8); }
+            100% { opacity: 0; transform: translate(-50%, -100px) scale(1.1); }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- CANVAS PARA EL EFECTO DE ESTRELLAS -->
+    <canvas id="stars-canvas"></canvas>
+
+    <!-- PANTALLA 1: FILTRO DE ESTATURA -->
+    <div id="screen1" class="card">
+        <h1>HOLA FATIMA JAPI CUMPLE</h1>
+        <p>para q puedas entrar a la pagina tienes q responder unas preguntitas jej</p>
+        <p class="italic-quote">(Tú sabes cuánto medimos)</p>
+        <input type="text" id="passwordInput" placeholder="Ingresa el número" autocomplete="off">
+        <button onclick="checkScreen1()">Verificar</button>
+        <div id="feedback1"></div>
+    </div>
+
+    <!-- PANTALLA 2: TRIVIA INTERACTIVA -->
+    <div id="screen2" class="card hidden">
+        <h1 id="triviaTitle">Pregunta 1 de 3</h1>
+        <p id="triviaQuestion">Cargando pregunta...</p>
+        <div class="trivia-options" id="optionsContainer"></div>
+        <div id="feedback2"></div>
+    </div>
+
+    <!-- PANTALLA 3: EL RINCÓN DE NOSOTROS (PORTAL PRINCIPAL) -->
+    <div id="screen3" class="card final-layout hidden">
+        <div class="section-badge">Fatima y Luisito archive<3</div>
+        <h2>Feliz Cumpleaños</h2>
+        
+        <!-- Pestañas del Rincón -->
+        <div class="tabs-nav">
+            <div class="tab-link active" onclick="switchTab(event, 'carta-tab')">Tu Carta</div>
+            <div class="tab-link" onclick="switchTab(event, 'cartas-ella-tab')">Tus Textos</div>
+            <div class="tab-link" onclick="switchTab(event, 'galeria-tab')">Dibujitos</div>
+        </div>
+
+        <!-- PESTAÑA 1: TU CARTA -->
+        <div id="carta-tab" class="tab-content active">
+            <p>Querida Fatima,<br>
+            Quiero aprovechar este momento para agradecerte por la amistad que hemos construido, aunque sea a la distancia. Es increíble cómo alguien puede volverse tan especial sin necesidad de compartir el mismo espacio físico, y tú lo has logrado con tu forma de ser tan auténtica y cercana.</p>
+            <p>Me gusta que nuestras conversaciones siempre tengan esa chispa que alegra el día. A veces, un simple mensaje tuyo basta para sacarme una sonrisa y recordarme que la amistad no depende de la distancia, sino de la conexión sincera entre dos personas.</p>
+            <p>Gracias por tu compañía, por escuchar y por compartir momentos que, aunque virtuales, se sienten muy reales. Espero que esta carta te recuerde lo importante que eres para mí y que nuestra amistad siga creciendo con la misma buena vibra que siempre nos acompaña.</p>
+            <p>Con cariño,<br>
+            Luisito</p>
+        </div>
+
+        <!-- PESTAÑA 2: SUS CARTAS (GUARDADAS COMO TESOROS) -->
+        <div id="cartas-ella-tab" class="tab-content">
+            <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 15px;">Colección de los textos poéticos que has dejado guardados en mi memoria:</p>
+            
+            <div class="archive-item">
+                <div class="archive-title">Archivo: 01/07/2026</div>
+                <div class="letter-text">
+                    "Provocas en mi vida una dicha que no sabría nombrar sin quedarme corta; una felicidad que llega en silencio, se posa con delicadeza y permanece, dejando huellas imborrables en mi memoria... Nunca encontraré la forma exacta de decir cuánto te quiero ni de agradecer la felicidad que has sembrado en mi vida."
+                </div>
+            </div>
+
+            <div class="archive-item">
+                <div class="archive-title">Archivo: 28/06/2026</div>
+                <div class="letter-text">
+                    "No hablo de posesión, sino de elección. Mi alma no se rinde ante nada; te elige cada día porque hay personas que no se quedan por obligación, sino porque el corazón encuentra en ellas un lugar al que siempre quiere volver... Me haces creer, sentir y querer; haces de este mundo un mejor lugar."
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 3: GALERÍA DE FOTOS DEL ESPACIO Y DIBUJOS -->
+        <div id="galeria-tab" class="tab-content">
+            <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 15px;">Espacio reservado para las fotos cósmicas y los dibujos que representan lo nuestro:</p>
+            
+            <div class="archive-item">
+                <img src="pag.jpg" style="width: 100%; border-radius: 8px; margin-bottom: 10px;" alt="Dibujo 1">
+            </div>
+
+            <div class="archive-item">
+                <img src="pag2.jpg" style="width: 100%; border-radius: 8px; margin-bottom: 10px;" alt="Dibujo 2">
+                <div class="archive-title" style="text-align: center; margin: 0;">Tus obras de arte y pequeños detalles</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 1. Efecto de Estrellas de Fondo (Canvas) Interactivo y Parallax
+        const canvas = document.getElementById('stars-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, stars = [];
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let targetX = mouseX;
+        let targetY = mouseY;
+
+        // Seguir el mouse para el efecto parallax
+        document.addEventListener('mousemove', (e) => {
+            targetX = e.clientX;
+            targetY = e.clientY;
+        });
+        
+        // Soporte para touch en celulares
+        document.addEventListener('touchmove', (e) => {
+            if(e.touches.length > 0) {
+                targetX = e.touches[0].clientX;
+                targetY = e.touches[0].clientY;
+            }
+        });
+
+        // Easter Egg: Mensaje Secreto al hacer clic en el fondo
+        document.addEventListener('click', (e) => {
+            // Verifica que el clic sea en el fondo y no dentro de la tarjeta
+            if (e.target.id === 'stars-canvas' || e.target.tagName.toLowerCase() === 'body') {
+                const msg = document.createElement('div');
+                msg.className = 'secret-msg';
+                msg.innerText = 'tequieromuchofatimacute';
+                msg.style.left = e.clientX + 'px';
+                msg.style.top = e.clientY + 'px';
+                document.body.appendChild(msg);
+                
+                // Se elimina despues de la animacion
+                setTimeout(() => msg.remove(), 2000);
+            }
+        });
+
+        function initStars() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            stars = [];
+            // Aumentamos a 200 estrellas para que se vea más tupido
+            for (let i = 0; i < 200; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    r: Math.random() * 1.5,
+                    dy: (Math.random() * 0.3) + 0.1, // velocidad de caída
+                    alpha: Math.random(), // opacidad inicial
+                    dAlpha: (Math.random() * 0.02) - 0.01 // velocidad de parpadeo
+                });
+            }
+        }
+
+        function animateStars() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Movimiento suave hacia el mouse (interpolación)
+            mouseX += (targetX - mouseX) * 0.05;
+            mouseY += (targetY - mouseY) * 0.05;
+
+            for (let i = 0; i < stars.length; i++) {
+                let star = stars[i];
+                
+                // Efecto Parallax: las estrellas se mueven sutilmente con el mouse
+                let parallaxX = (mouseX - width / 2) * (star.r * -0.015);
+                let parallaxY = (mouseY - height / 2) * (star.r * -0.015);
+
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                ctx.beginPath();
+                ctx.arc(star.x + parallaxX, star.y + parallaxY, star.r, 0, Math.PI * 2, true);
+                
+                // Interacción: si el mouse/dedo pasa muy cerca, las estrellas se alejan tantito
+                let dx = (star.x + parallaxX) - mouseX;
+                let dy = (star.y + parallaxY) - mouseY;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < 80) {
+                    star.x += dx * 0.01;
+                    star.y += dy * 0.01;
+                }
+
+                // Efecto Destello (Flicker)
+                star.alpha += star.dAlpha;
+                if (star.alpha <= 0.1 || star.alpha >= 1) {
+                    star.dAlpha = -star.dAlpha; // revierte el cambio
+                }
+
+                // Caída de la estrella
+                star.y += star.dy;
+                
+                // Reiniciar si sale de la pantalla
+                if (star.y > height) {
+                    star.y = 0;
+                    star.x = Math.random() * width;
+                }
+                ctx.fill();
+            }
+            requestAnimationFrame(animateStars);
+        }
+
+        window.addEventListener('resize', initStars);
+        initStars();
+        animateStars();
+
+        // 2. Lógica del Filtro Inicial (Diferencia de Estatura = 18)
+        function checkScreen1() {
+            const answer = document.getElementById('passwordInput').value.trim();
+            const feedback = document.getElementById('feedback1');
+            const messages = ["nope, saca bien la cuenta", "animo chavalin, tu puedes", "... acuerdate de tu cm extra"];
+            
+            if (answer === '18') {
+                document.getElementById('screen1').classList.add('hidden');
+                document.getElementById('screen2').classList.remove('hidden');
+                loadQuestion();
+            } else {
+                feedback.innerText = messages[Math.min(failCount1, messages.length - 1)];
+                failCount1++;
+            }
+        }
+
+        // 3. Base de Datos de la Trivia
+        const triviaData = [
+            {
+                question: "si tuvieras q escoger uno de estos a quien elegirias?",
+                options: ["justin beaber", "jude bellingham", "luisin"],
+                correct: 2,
+                failMessages: ["HMMM ESTAS SEGURA?", "ok fatima ok"]
+            },
+            {
+                question: "Con cual de estos libros lloraste mas?",
+                options: ["Etéreo", "Nosotros en la luna", "El mapa de los anhelos"],
+                correct: 'any',
+                failMessage: ""
+            },
+            {
+                question: "A quien te llevarias a vivir contigo a Zermatt?",
+                options: ["Luis", "Wis", "Luisito"],
+                correct: 2,
+                failMessages: ["nee, otro", "HMMTA, es el otro"]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let failCount = 0;
+        let failCount1 = 0;
+
+        function loadQuestion() {
+            const currentQuestion = triviaData[currentQuestionIndex];
+            document.getElementById('triviaTitle').innerText = `Pregunta ${currentQuestionIndex + 1} de 3`;
+            document.getElementById('triviaQuestion').innerText = currentQuestion.question;
+            
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+            document.getElementById('feedback2').innerText = '';
+
+            currentQuestion.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn";
+                btn.innerText = option;
+                btn.onclick = () => checkAnswer(index);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIndex) {
+            const currentQuestion = triviaData[currentQuestionIndex];
+            const feedback = document.getElementById('feedback2');
+
+            if (currentQuestion.correct === 'any' || selectedIndex === currentQuestion.correct) {
+                failCount = 0; // Reset fail count on success
+                currentQuestionIndex++;
+                if (currentQuestionIndex < triviaData.length) {
+                    loadQuestion();
+                } else {
+                    document.getElementById('screen2').classList.add('hidden');
+                    document.getElementById('screen3').classList.remove('hidden');
+                }
+            } else {
+                if (currentQuestionIndex === 0 || currentQuestionIndex === 2) { // Logic for 1st and 3rd question
+                    feedback.innerText = currentQuestion.failMessages[Math.min(failCount, currentQuestion.failMessages.length - 1)];
+                    failCount++;
+                } else {
+                    feedback.innerText = currentQuestion.failMessage;
+                }
+            }
+        }
+
+        // 4. Sistema de Pestañas (Tabs)
+        function switchTab(event, tabId) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            const links = document.querySelectorAll('.tab-link');
+            links.forEach(link => link.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>
